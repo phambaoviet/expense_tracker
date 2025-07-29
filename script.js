@@ -10,6 +10,7 @@ const filterBtn = document.getElementById('filter-btn');
 const resetFilterBtn = document.getElementById('reset-filter');
 
 let expenses = JSON.parse(localStorage.getItem('expenses')) || []; // Array store expenses
+let filteredExpenses = []; // Array to store filtered expenses
 
 // Function saveExpenses to localStorage
 function saveExpenses() {
@@ -20,8 +21,9 @@ function saveExpenses() {
 function addExpense(description, amount) {
   const date = new Date().toLocaleString('vi-VN');
   expenses.push({ description, amount, date });
+  filteredExpenses = expenses; // Update the filtered expenses
   saveExpenses();
-  renderExpenses();
+  //renderExpenses();
 }
 
 form.addEventListener('submit', function (e) {
@@ -38,7 +40,10 @@ form.addEventListener('submit', function (e) {
 
 // Function to delete an expense
 function deleteExpense(index) {
-  expenses.splice(index, 1); // Remove the expense from the array
+  const expenseToDelete = filteredExpenses[index]; // Get the expense to delete
+  const originlIndex = expenses.indexOf(expenseToDelete); // Find the original index in the expenses array
+  expenses.splice(originlIndex, 1); // Remove the expense from the array
+  filteredExpenses = expenses; // Update the filtered expenses
   saveExpenses();
   renderExpenses();
 }
@@ -52,12 +57,33 @@ clearAllBtn.addEventListener('click', function () {
   }
 });
 
+// Function to filter expenses by date
+filterBtn.addEventListener('click', () => {
+  const selectedDate = filterDateInput.value; // Get the selected date
+  if (selectedDate) {
+    const fomattedDate = new Date(selectedDate).toLocaleDateString('vi-VN'); // Format the date
+    filteredExpenses = expenses.filter((expense) => {
+      expense.date.startsWith(fomattedDate); // Filter expenses that match the selected date
+    });
+    renderExpenses(); // Render the filtered expenses
+  } else {
+    alert('Please select a date to filter expenses.');
+  }
+});
+
+// Function to reset the filter
+resetFilterBtn.addEventListener('click', () => {
+  filteredExpenses = expenses; // Reset the filtered expenses to the original expenses
+  renderExpenses(); // Render the original expenses
+  filterDateInput.value = ''; // Clear the date input
+});
+
 // function display
 function renderExpenses() {
   expenseList.innerHTML = ''; // Clear the current list
   let total = 0; // Initialize total to 0
 
-  expenses.forEach((expense, index) => {
+  filteredExpenses.forEach((expense, index) => {
     // Loop through each expense
     const row = document.createElement('tr');
     row.innerHTML = `
