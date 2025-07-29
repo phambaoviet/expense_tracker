@@ -9,7 +9,7 @@ const filterDateInput = document.getElementById('filter-date');
 const filterBtn = document.getElementById('filter-btn');
 const resetFilterBtn = document.getElementById('reset-filter');
 
-let expenses = JSON.parse(localStorage.getItem('expense')) || []; // Array store expenses
+let expenses = JSON.parse(localStorage.getItem('expenses')) || []; // Array store expenses
 
 // Function saveExpenses to localStorage
 function saveExpenses() {
@@ -21,6 +21,7 @@ function addExpense(description, amount) {
   const date = new Date().toLocaleString('vi-VN');
   expenses.push({ description, amount, date });
   saveExpenses();
+  renderExpenses();
 }
 
 form.addEventListener('submit', function (e) {
@@ -35,12 +36,19 @@ form.addEventListener('submit', function (e) {
   }
 });
 
+// Function to delete an expense
+function deleteExpense(index) {
+  expenses.splice(index, 1); // Remove the expense from the array
+  saveExpenses();
+  renderExpenses();
+}
+
 // function display
 function renderExpenses() {
   expenseList.innerHTML = ''; // Clear the current list
   let total = 0; // Initialize total to 0
 
-  expenses.forEach((expense) => {
+  expenses.forEach((expense, index) => {
     // Loop through each expense
     const row = document.createElement('tr');
     row.innerHTML = `
@@ -50,6 +58,11 @@ function renderExpenses() {
       <td><button class ="delete-btn">Delete</button></td>
     `;
     expenseList.appendChild(row); // Append the row to the table body
+    // Add event listener to the delete button
+    const deleteBtn = row.querySelector('.delete-btn');
+    deleteBtn.addEventListener('click', () => {
+      deleteExpense(index);
+    });
     total += expense.amount;
   });
 
