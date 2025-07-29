@@ -43,6 +43,15 @@ function deleteExpense(index) {
   renderExpenses();
 }
 
+// Function to clear all expenses
+clearAllBtn.addEventListener('click', function () {
+  if (confirm('Are you sure you want to clear all expenses?')) {
+    expenses = []; // Reset the expenses array
+    saveExpenses();
+    renderExpenses();
+  }
+});
+
 // function display
 function renderExpenses() {
   expenseList.innerHTML = ''; // Clear the current list
